@@ -1,0 +1,25 @@
+{
+    "name": "nouvu/lermaext",
+    "description": "ext drivers for Lerma",
+    "type": "library",
+    "license": "Apache-2.0",
+	"homepage": "https://github.com/MouseZver/LermaExt",
+	"keywords": [
+        "LermaExt",
+		"php7.4"
+    ],
+    "authors": [
+        {
+            "name": "MouseZver",
+            "email": "mouse-zver@xaker.ru"
+        }
+    ],
+	"require": {
+		"php": ">=7.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"Nouvu\\Database\\LermaExt": "src"
+		}
+	}
+}
