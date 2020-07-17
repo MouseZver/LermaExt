@@ -60,7 +60,7 @@ final class Mysql implements InterfaceDriver
 				$this -> params['username'], 
 				$this -> params['password'], 
 				$this -> params['dbname'], 
-				$this -> params['port']
+				( int ) $this -> params['port']
 			);
 			
 			if ( $this -> connect -> connect_error ) 
@@ -68,7 +68,7 @@ final class Mysql implements InterfaceDriver
 				throw new Error( sprintf ( $this -> config -> get( "errMessage.connect.{$this -> driver}" ), $this -> connect -> connect_errno, $this -> connect -> connect_error ) );
 			}
 			
-			$this -> connect -> set_charset( $this -> params -> charset );
+			$this -> connect -> set_charset( $this -> params['charset'] );
 		}
 		catch ( \mysqli_sql_exception $e )
 		{
@@ -257,7 +257,7 @@ final class Mysql implements InterfaceDriver
 	*/
 	protected function result()
 	{
-		if ( ! is_null ( $this -> lerma -> statement ) )
+		if ( ! is_null ( $this -> statement ) )
 		{
 			return $this -> result ?: $this -> result = $this -> statement -> get_result();
 		}

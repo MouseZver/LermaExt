@@ -82,7 +82,7 @@ final class Sqlite implements InterfaceDriver
 	
 	public function close(): InterfaceDriver
 	{
-		if ( ! is_null ( $this -> lerma -> statement ) )
+		if ( ! is_null ( $this -> statement ) )
 		{
 			$this -> statement -> close();
 		}
