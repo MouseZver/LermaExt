@@ -19,7 +19,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Nouvu\\Database\\LermaExt": "src"
+			"Nouvu\\Database\\LermaExt\\": "src"
 		}
 	}
 }
