@@ -62,18 +62,18 @@ final class Mysql implements InterfaceDriver
 				$this -> params['dbname'], 
 				$this -> params['port']
 			);
+			
+			if ( $this -> connect -> connect_error ) 
+			{
+				throw new Error( sprintf ( $this -> config -> get( "errMessage.connect.{$this -> driver}" ), $this -> connect -> connect_errno, $this -> connect -> connect_error ) );
+			}
+			
+			$this -> connect -> set_charset( $this -> params -> charset );
 		}
 		catch ( \mysqli_sql_exception $e )
 		{
 			$this -> config -> get( "ShemaExceptionConnect.{$this -> driver}" )( $e );
 		}
-		
-		if ( $this -> connect -> connect_error ) 
-		{
-			throw new Error( sprintf ( $this -> config -> get( "errMessage.connect.{$this -> driver}" ), $this -> connect -> connect_errno, $this -> connect -> connect_error ) );
-		}
-		
-		$this -> connect -> set_charset( $this -> params -> charset );
 	}
 	
 	public function query( string $sql ): void
@@ -211,7 +211,7 @@ final class Mysql implements InterfaceDriver
 				throw new Error( "Invalid type {$type}" );
 			}
 			
-			$for[0] .= $type{0};
+			$for[0] .= $type[0];
 			
 			$count++;
 		}
