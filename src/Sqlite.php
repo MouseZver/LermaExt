@@ -16,7 +16,7 @@ use Nouvu\Database\{
 	InterfaceDriver 
 };
 use Error;
-use Nouvu\Config;
+use Nouvu\Config\Config;
 
 final class Sqlite implements InterfaceDriver
 {
