@@ -200,13 +200,15 @@ final class Mysql implements InterfaceDriver
 	
 	public function binding( array $binding ): void
 	{
+		$this -> result = null;
+		
 		$for = [ '' ];
 		
 		$count = 0;
 		
 		foreach ( $binding[0] AS $args )
 		{
-			if ( !in_array ( $type = gettype ( $args ), [ 'integer', 'double', 'string' ] ) )
+			if ( ! in_array ( $type = gettype ( $args ), [ 'integer', 'double', 'string' ] ) )
 			{
 				throw new Error( "Invalid type {$type}" );
 			}
