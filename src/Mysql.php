@@ -206,7 +206,7 @@ final class Mysql implements InterfaceDriver
 		
 		$count = 0;
 		
-		foreach ( $binding[0] AS $args )
+		foreach ( $this -> lerma -> executeHolders( $binding[0] ) AS $args )
 		{
 			if ( ! in_array ( $type = gettype ( $args ), [ 'integer', 'double', 'string' ] ) )
 			{
@@ -217,7 +217,7 @@ final class Mysql implements InterfaceDriver
 			
 			$count++;
 		}
-
+		
 		for ( $i = 0; $i < $count; $for[] = &${ 'bind_' . $i++ } ){}
 		
 		$this -> statement -> bind_param( ...$for );
