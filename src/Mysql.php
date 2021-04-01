@@ -208,12 +208,21 @@ final class Mysql implements InterfaceDriver
 		
 		foreach ( $this -> lerma -> executeHolders( $binding[0] ) AS $args )
 		{
-			if ( ! in_array ( $type = gettype ( $args ), [ 'integer', 'double', 'string' ] ) )
+			$short = [
+				'integer' => 'i', 
+				'double' => 'd', 
+				'string' => 's',
+				'NULL' => 's'
+			];
+			
+			$type = gettype ( $args );
+			
+			if ( ! isset ( $short[$type] ) )
 			{
 				throw new Error( "Invalid type {$type}" );
 			}
 			
-			$for[0] .= $type[0];
+			$for[0] .= $short[$type];
 			
 			$count++;
 		}
