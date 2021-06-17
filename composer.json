@@ -6,7 +6,7 @@
 	"homepage": "https://github.com/MouseZver/LermaExt",
 	"keywords": [
         "LermaExt",
-		"php7.4"
+		"PHP 8.0"
     ],
     "authors": [
         {
@@ -15,7 +15,7 @@
         }
     ],
 	"require": {
-		"php": ">=7.4"
+		"php": ">=8.0"
 	},
 	"autoload": {
 		"psr-4": {

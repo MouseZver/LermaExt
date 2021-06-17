@@ -5,16 +5,14 @@ declare ( strict_types = 1 );
 /*
 	@ Author: MouseZver
 	@ Email: mouse-zver@xaker.ru
-	@ url-source: http://github.com/MouseZver/Lerma
-	@ php-version 7.4
+	@ url-source: https://github.com/MouseZver/LermaExt
+	@ php-version 8.0
 */
 
 namespace Nouvu\Database\LermaExt;
 
-use Nouvu\Database\{ 
-	Lerma, 
-	InterfaceDriver 
-};
+use Nouvu\Database\Lerma;
+use Nouvu\Database\InterfaceDriver;
 use Error;
 use Nouvu\Config\Config;
 
@@ -26,29 +24,14 @@ final class Sqlite implements InterfaceDriver
 	
 	private $result;
 	
-	private Lerma $lerma;
-	
-	private Config $config;
-	
-	private string $driver;
-	
 	private \SQLite3 $connect;
 	
-	private array $params;
-	
-	public function __construct ( Lerma $lerma, Config $config, string $driver )
+	public function __construct ( private Lerma $lerma, private Config $config, private string $driver )
 	{
-		$this -> lerma = $lerma;
-		
-		$this -> config = $config;
-		
 		$this -> connect = new \SQLite3( $this -> config -> get( "drivers.{$driver}.db" ) );
 	}
 	
-	public function isError( $obj = null )
-	{
-		
-	}
+	public function isError( $obj = null ) {}
 	
 	public function query( string $sql ): void
 	{
@@ -100,49 +83,30 @@ final class Sqlite implements InterfaceDriver
 		return $this -> query ?: $this -> result;
 	}
 	
-	public function fetch( int $int )
+	public function fetch( int $int ): mixed
 	{
-		switch ( $int )
+		return match( $int ): mixed
 		{
-			case Lerma :: FETCH_NUM:
+			Lerma :: FETCH_NUM		=> fn(): array | false => $this -> result() -> fetchArray( \SQLITE3_NUM ),
+			Lerma :: FETCH_ASSOC	=> fn(): array | false => $this -> result() -> fetchArray( \SQLITE3_ASSOC ),
+			Lerma :: FETCH_OBJ 		=> function (): object | null
 			{
-				return $this -> result() -> fetchArray( SQLITE3_NUM );
-				
-				break;
-			}
-			
-			case Lerma :: FETCH_ASSOC:
-			{
-				return $this -> result() -> fetchArray( SQLITE3_ASSOC );
-				
-				break;
-			}
-			
-			case Lerma :: FETCH_OBJ:
-			{
-				if ( $res = $this -> fetch( Lerma :: FETCH_ASSOC ) )
+				if ( $res = $this -> result() -> fetchArray( \SQLITE3_ASSOC ) )
 				{
 					return ( object ) $res;
 				}
 				
 				return null;
-				
-				break;
-			}
-			
-			default:
-			{
-				return null;
-			}
-		}
+			},
+			default	=> fn() => null,
+		}();
 	}
 	
-	public function fetchAll( int $int ): ?array
+	public function fetchAll( int $int ): array | null
 	{
-		switch ( $int )
+		return match( $int ): array | null
 		{
-			case Lerma :: FETCH_NUM:
-			case Lerma :: FETCH_ASSOC:
+			Lerma :: FETCH_NUM, Lerma :: FETCH_ASSOC, Lerma :: FETCH_OBJ => function (): array
 			{
 				$all = [];
 				
@@ -152,14 +116,9 @@ final class Sqlite implements InterfaceDriver
 				}
 
 				return $all;
-				break;
-			}
-			
-			default:
-			{
-				return null;
-			}
-		}
+			},
+			default	=> fn() => null,
+		}();
 	}
 	
 	public function columnCount(): int

@@ -5,16 +5,14 @@ declare ( strict_types = 1 );
 /*
 	@ Author: MouseZver
 	@ Email: mouse-zver@xaker.ru
-	@ url-source: http://github.com/MouseZver/Lerma
-	@ php-version 7.4
+	@ url-source: https://github.com/MouseZver/LermaExt
+	@ php-version 8.0
 */
 
 namespace Nouvu\Database\LermaExt;
 
-use Nouvu\Database\{ 
-	Lerma, 
-	InterfaceDriver 
-};
+use Nouvu\Database\Lerma;
+use Nouvu\Database\InterfaceDriver;
 use Error;
 use Nouvu\Config\Config;
 
@@ -26,26 +24,10 @@ final class Mysql implements InterfaceDriver
 	
 	private $result;
 	
-	private Lerma $lerma;
-	
-	private Config $config;
-	
-	private string $driver;
-	
 	private \mysqli $connect;
 	
-	private array $params;
-	
-	public function __construct ( Lerma $lerma, Config $config, string $driver )
+	public function __construct ( private Lerma $lerma, private Config $config, private string $driver )
 	{
-		$this -> lerma = $lerma;
-		
-		$this -> config = $config;
-		
-		$this -> driver = $driver;
-		
-		$this -> params = $this -> config -> get( "drivers.{$this -> driver}" );
-		
 		mysqli_report ( MYSQLI_REPORT_STRICT ); 
 		
 		$this -> connect();
@@ -53,26 +35,32 @@ final class Mysql implements InterfaceDriver
 	
 	private function connect()
 	{
+		$params = $this -> config -> get( 'drivers.' . $this -> driver );
+		
 		try
 		{
 			$this -> connect = new \mysqli( 
-				$this -> params['host'], 
-				$this -> params['username'], 
-				$this -> params['password'], 
-				$this -> params['dbname'], 
-				( int ) $this -> params['port']
+				$params['host'], 
+				$params['username'], 
+				$params['password'], 
+				$params['dbname'], 
+				( int ) $params['port']
 			);
 			
 			if ( $this -> connect -> connect_error ) 
 			{
-				throw new Error( sprintf ( $this -> config -> get( "errMessage.connect.{$this -> driver}" ), $this -> connect -> connect_errno, $this -> connect -> connect_error ) );
+				throw new Error( sprintf ( 
+					$this -> config -> get( 'errMessage.connect.' . $this -> driver ), 
+					$this -> connect -> connect_errno, 
+					$this -> connect -> connect_error 
+				) );
 			}
 			
-			$this -> connect -> set_charset( $this -> params['charset'] );
+			$this -> connect -> set_charset( $params['charset'] );
 		}
 		catch ( \mysqli_sql_exception $e )
 		{
-			$this -> config -> get( "ShemaExceptionConnect.{$this -> driver}" )( $e );
+			$this -> config -> get( 'ShemaExceptionConnect.' . $this -> driver )( $e );
 		}
 	}
 	
@@ -90,72 +78,28 @@ final class Mysql implements InterfaceDriver
 		$this -> statement = $this -> connect -> prepare( $sql );
 	}
 	
-	public function fetch( int $int )
+	public function fetch( int $int ): mixed
 	{
-		switch ( $int )
+		return match( $int ): mixed
 		{
-			case Lerma :: FETCH_NUM:
-			{
-				return $this -> result() -> fetch_array( MYSQLI_NUM );
-			}
-			
-			case Lerma :: FETCH_ASSOC:
-			{
-				return $this -> result() -> fetch_array( MYSQLI_ASSOC );
-			}
-			
-			case Lerma :: FETCH_OBJ:
-			{
-				return $this -> result() -> fetch_object();
-			}
-			
-			case Lerma :: MYSQL_FETCH_BIND:
-			{
-				return $this -> statement -> fetch();
-			}
-			
-			case Lerma :: MYSQL_FETCH_FIELD:
-			{
-				return ( array ) $this -> result() -> fetch_field();
-			}
-			
-			default:
-			{
-				return null;
-			}
-		}
+			Lerma :: FETCH_NUM			=> $this -> result() -> fetch_array( \MYSQLI_NUM ),
+			Lerma :: FETCH_ASSOC		=> $this -> result() -> fetch_array( \MYSQLI_ASSOC ),
+			Lerma :: FETCH_OBJ 			=> $this -> result() -> fetch_object(),
+			Lerma :: MYSQL_FETCH_BIND	=> $this -> statement -> fetch(),
+			Lerma :: MYSQL_FETCH_FIELD	=> ( array ) $this -> result() -> fetch_field(),
+			default						=> null,
+		};
 	}
 	
-	public function fetchAll( int $int )
+	public function fetchAll( int $int ): mixed
 	{
-		switch ( $int )
+		return match( $int ): mixed
 		{
-			case Lerma :: FETCH_NUM:
-			{
-				return $this -> result() -> fetch_all( MYSQLI_NUM );
-				
-				break;
-			}
-			
-			case Lerma :: FETCH_ASSOC:
-			{
-				return $this -> result() -> fetch_all( MYSQLI_ASSOC );
-			
-				break;
-			}
-			
-			case Lerma :: MYSQL_FETCH_FIELD:
-			{
-				return $thiss -> result() -> fetch_fields();
-			
-				break;
-			}
-			
-			default:
-			{
-				return null;
-			}
-		}
+			Lerma :: FETCH_NUM			=> $this -> result() -> fetch_all( \MYSQLI_NUM ),
+			Lerma :: FETCH_ASSOC		=> $this -> result() -> fetch_all( \MYSQLI_ASSOC ),
+			Lerma :: MYSQL_FETCH_FIELD	=> $this -> result() -> fetch_fields(),
+			default						=> null,
+		};
 	}
 	
 	public function columnCount(): int
