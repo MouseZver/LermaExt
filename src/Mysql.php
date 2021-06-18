@@ -13,6 +13,7 @@ namespace Nouvu\Database\LermaExt;
 
 use Nouvu\Database\Lerma;
 use Nouvu\Database\InterfaceDriver;
+use Nouvu\Database\RequestException;
 use Error;
 use Nouvu\Config\Config;
 
@@ -49,11 +50,10 @@ final class Mysql implements InterfaceDriver
 			
 			if ( $this -> connect -> connect_error ) 
 			{
-				throw new Error( sprintf ( 
-					$this -> config -> get( 'errMessage.connect.' . $this -> driver ), 
+				throw new RequestException( [
 					$this -> connect -> connect_errno, 
-					$this -> connect -> connect_error 
-				) );
+					$this -> connect -> connect_error
+				], 300 );
 			}
 			
 			$this -> connect -> set_charset( $params['charset'] );
@@ -192,7 +192,7 @@ final class Mysql implements InterfaceDriver
 			return $this -> statement -> bind_result( ...$result );
 		}
 		
-		throw new Error( $this -> config -> get( 'errMessage.statement.bindResult' ) );
+		throw new RequestException( code: 220 );
 	}
 	
 	public function close(): InterfaceDriver
