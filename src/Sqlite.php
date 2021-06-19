@@ -85,7 +85,7 @@ final class Sqlite implements InterfaceDriver
 	
 	public function fetch( int $int ): mixed
 	{
-		return match( $int ): mixed
+		return match( $int )
 		{
 			Lerma :: FETCH_NUM		=> fn(): array | false => $this -> result() -> fetchArray( \SQLITE3_NUM ),
 			Lerma :: FETCH_ASSOC	=> fn(): array | false => $this -> result() -> fetchArray( \SQLITE3_ASSOC ),
@@ -104,7 +104,7 @@ final class Sqlite implements InterfaceDriver
 	
 	public function fetchAll( int $int ): array | null
 	{
-		return match( $int ): array | null
+		return match( $int )
 		{
 			Lerma :: FETCH_NUM, Lerma :: FETCH_ASSOC, Lerma :: FETCH_OBJ => function (): array
 			{

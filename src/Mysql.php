@@ -80,7 +80,7 @@ final class Mysql implements InterfaceDriver
 	
 	public function fetch( int $int ): mixed
 	{
-		return match( $int ): mixed
+		return match( $int )
 		{
 			Lerma :: FETCH_NUM			=> $this -> result() -> fetch_array( \MYSQLI_NUM ),
 			Lerma :: FETCH_ASSOC		=> $this -> result() -> fetch_array( \MYSQLI_ASSOC ),
@@ -93,7 +93,7 @@ final class Mysql implements InterfaceDriver
 	
 	public function fetchAll( int $int ): mixed
 	{
-		return match( $int ): mixed
+		return match( $int )
 		{
 			Lerma :: FETCH_NUM			=> $this -> result() -> fetch_all( \MYSQLI_NUM ),
 			Lerma :: FETCH_ASSOC		=> $this -> result() -> fetch_all( \MYSQLI_ASSOC ),
